@@ -2,6 +2,9 @@ import db
 import nltk
 nltk.data.path.append("./nltk_data")
 
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
 from nltk.tag import pos_tag
 from PyDictionary import PyDictionary
@@ -15,39 +18,69 @@ class htmlparser(object):
         self.dictionary = PyDictionary()
         self.keywords_list = []
         
-        
     
     def analyzer(self,question):
+        def is_noun(tag):
+            return tag in ['NN', 'NNS', 'NNP', 'NNPS']
+
+        def is_verb(tag):
+            return tag in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+
+        def is_adverb(tag):
+            return tag in ['RB', 'RBR', 'RBS']
+
+        def is_adjective(tag):
+            return tag in ['JJ', 'JJR', 'JJS']
+
+        def penn_to_wn(tag):
+            if is_adjective(tag):
+                return wn.ADJ
+            elif is_noun(tag):
+                return wn.NOUN
+            elif is_adverb(tag):
+                return wn.ADV
+            elif is_verb(tag):
+                return wn.VERB
+            return wn.NOUN
         # "How do i view my course on Canvas"
-        tagged_sent = pos_tag(question.split())
+        
+        tagged_sent = nltk.pos_tag(word_tokenize(question))
         tokenizer = []
         mongo_dict ={}
         for word_tuple in tagged_sent:
-            if word_tuple[0] not in self.stop_words:
+            if word_tuple[0] not in self.stop_words and word_tuple[0]:
                 word_list = list(word_tuple)
                 word_list[0] = re.sub('[!?%$*.@]','',word_list[0])
                 tokenizer.append(tuple(word_list))
         
-        for word_tuple in tokenizer:
-            if word_tuple[1] == 'NNP':
-                self.keywords_list.append(word_tuple[0].lower())
+        for tag in tokenizer:
+            print ("tag",tag[0])
+            print (self.dictionary.synonym(tag[0].lower()))
+            if tag[1] == 'NNP':
+                self.keywords_list.append(tag[0].lower())
             else:
-                if self.dictionary.synonym(word_tuple[0].lower()):
-                    self.keywords_list.append(word_tuple[0].lower())
-                    self.keywords_list.extend(self.dictionary.synonym(word_tuple[0].lower()))
-                   
-        mongo_dict["keywords"] = list(set(self.keywords_list))
-        mongo_dict["text"] = "While creating a new assignment, click on More options. Set the submission type to Online submissions. From the short list of options that appear, you will want to check the box next to Enable Turnitin Submissions. You may also click on Advanced Settings to explore more options for your Turnitin assignment."
+                wn_tag = penn_to_wn(tag[1])
+                word = WordNetLemmatizer().lemmatize(tag[0],wn_tag)
+                print ("word -->", word)
+                print ("self.dictionary.synonym(word.lower()) -->",self.dictionary.synonym(word.lower()))
+                self.keywords_list.append(word.lower())
+                synonym_list = self.dictionary.synonym(word.lower())
+                if synonym_list:
+                    self.keywords_list.extend(synonym_list)
 
-        
-        self.dbclient.insert(mongo_dict)
+        mongo_dict["keywords"] = list(set(self.keywords_list))
+        mongo_dict["text"] = "Yes, Canvas can be integrated with products like: McGraw-Hill Connect, Macmillan Education, Cengage Learning MindTap, and Pearson's MyLab & Mastering. \
+Please visit: http://www.sjsu.edu/ecampus/teaching-tools/canvas/integrating-publisher-db/index.html for more information."
+
+        print (mongo_dict)
+        self.dbclient.insert(mongo_dict)    
 
         
         
         
 
 s = htmlparser()
-s.analyzer("How do I enable Turnitin for my assignments?")
+s.analyzer("Can I integrate my course with any publisher's database like McGraw-Hill Connect?")
 
 
 

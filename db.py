@@ -11,15 +11,18 @@ class Ecampusdb(object):
     
     def findAll(self,question_keyword):
         cursor = self.db.faq.find({})
+        print ("cursor",cursor)
         max_hit =0
         
-        dictionary = {}
         for document in cursor:
+            print ("document",document)
             keywords = document["keywords"]
             result = []
             hit = 0
             for que in question_keyword:
+                print (que,"que")
                 if que in keywords:
+                    print ("yes")
                     result.append(que)
                     hit += 1
 

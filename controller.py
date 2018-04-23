@@ -8,9 +8,7 @@ class controller(object):
     
     def find_solution(self,command):
         response = ""
-        if command.startswith('do'):
-            response = self.calculation.calculate(command)
-        else:
-            response = self.nlp.analyzer(command)
+        print ("HI FORAM")
+        response = self.nlp.analyzer(command)
         
         return response
