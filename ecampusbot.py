@@ -17,8 +17,9 @@ def parse_slack_output(slack_rtm_output):
     if output_list and len(output_list) > 0:
         for output in output_list:
             print (output,"out")
-            if output and 'text' in output and output['user'].strip() != AT_BOT:
-                print (output['user'].strip(),"user",AT_BOT)
+#            if output and 'text' in output and output['user'].strip() != AT_BOT:
+            if output and 'text' in output and output['bot_id'].strip() != AT_BOT:
+                print (output['bot_id'].strip(),"user",AT_BOT)
                 return output['text'].strip().lower(), \
                        output['channel']
     return None, None
@@ -30,7 +31,7 @@ if __name__ == "__main__":
         print ("SpartanBot connected and running!")
         while True:
             command, channel = parse_slack_output(slack_client.rtm_read())
-            print (command,channel)
+            print (command,channel,"cc")
             if command and channel:
                 handle_command(command, channel)
             time.sleep(READ_WEBSOCKET_DELAY)
