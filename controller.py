@@ -9,6 +9,9 @@ class controller(object):
     def find_solution(self,command):
         response = ""
         print ("HI FORAM")
+        print('------------------------------------')
+        print (command,"command")
+        print('------------------------------------')        
         response = self.nlp.analyzer(command)
         
         return response

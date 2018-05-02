@@ -31,7 +31,10 @@ class Ecampusdb(object):
                 max_hit = hit
 #        print ((max_hit/len(question_keyword)))
 
-
+        print('------------------------------------')
+        print ((max_hit/len(question_keyword)),"---max_hit percentage---")
+#        print (text,"---text---")
+        print('------------------------------------')
         if (max_hit/len(question_keyword))*100 >= 0.75:
             return text
         else:

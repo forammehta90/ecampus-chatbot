@@ -16,10 +16,8 @@ class Nlp(object):
         self.dbclient = db.Ecampusdb()
         self.stop_words = (set(stopwords.words('english')))
         self.dictionary = PyDictionary()
-        self.keywords_list = []
+
         
-        
-    
     def analyzer(self,question):
         # "How do i view my course on Canvas"
         def is_noun(tag):
@@ -44,19 +42,19 @@ class Nlp(object):
             elif is_verb(tag):
                 return wn.VERB
             return wn.NOUN
-
+            
+        keywords_list = []
         tagged_sent = nltk.pos_tag(word_tokenize(question))
 
         for tag in tagged_sent:
             if tag[0].lower() not in self.stop_words and tag:
                 wn_tag = penn_to_wn(tag[1])
                 word = WordNetLemmatizer().lemmatize(tag[0],wn_tag)
-                self.keywords_list.append(word.lower())
-        
-        print (self.keywords_list,"elf.keywords_list")
-
-        
-        response = self.dbclient.findAll(self.keywords_list)
+                keywords_list.append(word.lower())
+        print('------------------------------------')
+        print (keywords_list,"keywords_list")
+        print('------------------------------------')
+        response = self.dbclient.findAll(keywords_list)
         return response
 
         

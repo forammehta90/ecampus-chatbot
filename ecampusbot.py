@@ -17,9 +17,9 @@ def parse_slack_output(slack_rtm_output):
     if output_list and len(output_list) > 0:
         for output in output_list:
             print (output,"out")
-#            if output and 'text' in output and output['user'].strip() != AT_BOT:
-            if output and 'text' in output and output['bot_id'].strip() != AT_BOT:
-                print (output['bot_id'].strip(),"user",AT_BOT)
+#            if output and 'text' in output and output['user'].strip() != AT_BOT and output['user'] != 'USLACKBOT':   
+            if 'bot_id' in output and output and 'text' in output and output['bot_id'].strip() != AT_BOT:
+                print (output['bot_id'].strip(),"----user-----",AT_BOT)
                 return output['text'].strip().lower(), \
                        output['channel']
     return None, None

@@ -16,10 +16,11 @@ class htmlparser(object):
         self.dbclient = db.Ecampusdb()
         self.stop_words = (set(stopwords.words('english')))
         self.dictionary = PyDictionary()
-        self.keywords_list = []
+        
         
     
     def analyzer(self,question):
+
         def is_noun(tag):
             return tag in ['NN', 'NNS', 'NNP', 'NNPS']
 
@@ -44,6 +45,7 @@ class htmlparser(object):
             return wn.NOUN
         # "How do i view my course on Canvas"
         
+        keywords_list = []
         tagged_sent = nltk.pos_tag(word_tokenize(question))
         tokenizer = []
         mongo_dict ={}
@@ -57,18 +59,18 @@ class htmlparser(object):
             print ("tag",tag[0])
             print (self.dictionary.synonym(tag[0].lower()))
             if tag[1] == 'NNP':
-                self.keywords_list.append(tag[0].lower())
+                keywords_list.append(tag[0].lower())
             else:
                 wn_tag = penn_to_wn(tag[1])
                 word = WordNetLemmatizer().lemmatize(tag[0],wn_tag)
                 print ("word -->", word)
                 print ("self.dictionary.synonym(word.lower()) -->",self.dictionary.synonym(word.lower()))
-                self.keywords_list.append(word.lower())
+                keywords_list.append(word.lower())
                 synonym_list = self.dictionary.synonym(word.lower())
                 if synonym_list:
-                    self.keywords_list.extend(synonym_list)
+                    keywords_list.extend(synonym_list)
 
-        mongo_dict["keywords"] = list(set(self.keywords_list))
+        mongo_dict["keywords"] = list(set(keywords_list))
         mongo_dict["text"] = "Yes, Canvas can be integrated with products like: McGraw-Hill Connect, Macmillan Education, Cengage Learning MindTap, and Pearson's MyLab & Mastering. \
 Please visit: http://www.sjsu.edu/ecampus/teaching-tools/canvas/integrating-publisher-db/index.html for more information."
 
