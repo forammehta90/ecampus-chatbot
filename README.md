@@ -1,6 +1,4 @@
 
-Creating SlackBot for getting answers to ecampus website.
-
 # eCampus ChatBot
 
 The purpose of this application is to create a chatbot that will answer to any ecampus
